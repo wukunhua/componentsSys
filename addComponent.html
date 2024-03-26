@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/js/element/theme-default/index.css">
+    <script src="/js/jquery-1.7.2.min.js"></script>
+    <script src="/js/vue.min.js"></script>
+    <script src="/js/element/index.js"></script>
+</head>
+
+<body>
+    <div id="main_con">
+        <el-card>
+            <el-form :model="form" :rules="rules" ref="form" label-width="100px" class="demo-form">
+                <el-form-item label="配件名" prop="componentsname">
+                    <el-input v-model="form.componentsname"></el-input>
+                </el-form-item>
+                <el-form-item label="厂商" prop="manufacturer">
+                    <el-input v-model="form.manufacturer"></el-input>
+                </el-form-item>
+                <el-form-item label="配件数量" required prop="num">
+                    <el-input-number v-model="form.num"></el-input-number>
+                </el-form-item>
+                <el-form-item label="配件价格" prop="price">
+                    <el-input-number v-model="form.price"></el-input-number>
+                </el-form-item>
+                <el-form-item label="配件成本" prop="cost">
+                    <el-input-number v-model="form.cost"></el-input-number>
+                </el-form-item>
+                <el-form-item label="配件位置" prop="position">
+                    <el-input v-model="form.position"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="submitForm">添加</el-button>
+                </el-form-item>
+            </el-form>
+        </el-card>
+    </div>
+</body>
+<script>
+    new Vue({
+        el: "#main_con",
+        data: {
+            form: {
+                componentsname:"",
+                manufacturer:"",
+                cost:"",
+                num:"",
+                price:"",
+                position:"",
+            },
+            rules: {
+                componentsname: [
+                    { required: true, message: '请输入配件名', trigger: 'blur' },
+                ],
+                manufacturer: [
+                    { required: true, message: '请输入厂商', trigger: 'change' }
+                ],
+                num: [
+                    {  required: true, message: '请输入配件数量', trigger: 'change' }
+                ],
+                price: [
+                    {  required: true, message: '请输入配件价格', trigger: 'change' }
+                ],
+                cost: [
+                    {  required: true, message: '请输入配件成本', trigger: 'change' }
+                ],
+                position: [
+                    { required: true, message: '请输入配件位置', trigger: 'blur' }
+                ],
+            }
+        },
+        methods: {
+            submitForm(){
+                this.$refs.form.validate((validate)=>{
+                    if(validate){
+                        $.ajax({
+                            url:"/tomato/saveComponent",
+                            type:"post",
+                            data:this.form,
+                            success:(data)=>{
+                                if(data.code == 'v'){
+                                    this.$message({
+                                        message: '添加成功！',
+                                        type: 'success'
+                                    });
+                                    window.location.href = "./list.html"
+                                }
+                            }
+                        })
+                    }
+                })
+            }
+        },
+        mounted() {
+
+        }
+    })
+</script>
+
+</html>

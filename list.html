@@ -13,7 +13,7 @@
     <div id="main_con">
         <div style="display: flex;justify-content: space-between;margin: 20px 0;">
             <div style="display: flex;">
-                <el-input style="margin: 0 10px 0 0;" v-model="searchForm.componentname" placeholder="组件名搜索"></el-input>
+                <el-input style="margin: 0 10px 0 0;" v-model="searchForm.componentsname" placeholder="组件名搜索"></el-input>
                 <el-input style="margin: 0 10px 0 0;" v-model="searchForm.manufacturer" placeholder="厂商搜索"></el-input>
             </div>
             <div>
@@ -22,12 +22,12 @@
             </div>
         </div>
         <el-table :data="tabledata" border height="500" max-heiht="800">
-            <el-table-column label="组件名" prop="componentname"></el-table-column>
+            <el-table-column label="组件名" prop="componentsname"></el-table-column>
             <el-table-column label="厂商" prop="manufacturer"></el-table-column>
-            <el-table-column label="单价" prop="componentname"></el-table-column>
-            <el-table-column label="成本" prop="componentname"></el-table-column>
-            <el-table-column label="库存" prop="componentname"></el-table-column>
-            <el-table-column label="仓库中位置" prop="componentname"></el-table-column>
+            <el-table-column label="单价" prop="price"></el-table-column>
+            <el-table-column label="成本" prop="cost"></el-table-column>
+            <el-table-column label="库存" prop="num"></el-table-column>
+            <el-table-column label="仓库中位置" prop="position"></el-table-column>
             <el-table-column label="操作" prop="componentname">
                 <template slot-scope="scope">
                     <el-button size="small" type="success" icon="el-icon-plus" @click="go">入库</el-button>
@@ -35,6 +35,11 @@
                 </template>
             </el-table-column>
         </el-table>
+        <el-pagination
+            layout="prev, pager, next"
+            @current-change="pageChange"
+            :total="totalPage">
+        </el-pagination>
     </div>
 </body>
 <script>
@@ -51,13 +56,17 @@
                 componentname:"",
                 manufacturer:"",
             },
+            totalPage:0,
         },
         methods:{
+            pageChange(){
+
+            },
             search(){
 
             },
             add(){
-
+                window.location.href = "./addComponent.html"
             },
             go(){
                 this.$prompt('输入入库数量','提示',{
@@ -95,7 +104,19 @@
             }
         },
         mounted(){
+            $.ajax({
+                url:"/tomato/getComponentList",
+                type:"get",
+                data:{
 
+                },
+                success:(data)=>{
+                    if(data.code == 'v'){
+                        this.totalPage = data.data.total;
+                        this.tabledata = data.data.list;
+                    }
+                }
+            })
         }
     })
 </script>
