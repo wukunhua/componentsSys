@@ -1,27 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="stylesheet" href="/js/element/theme-default/index.css">
+    <link rel="stylesheet" href="./js/printjs/print.min.css">
     <script src="/js/jquery-1.7.2.min.js"></script>
     <script src="/js/vue.min.js"></script>
     <script src="/js/element/index.js"></script>
+    <script src="./js/html2canvas.js"></script>
+    <script src="./js/printjs/print.min.js"></script>
+    <style>
+        .el-pagination {
+            text-align: right;
+        }
+
+        #print tr {
+            border: 1px solid black;
+        }
+    </style>
 </head>
+
 <body>
     <div id="main_con">
         <div style="display: flex;justify-content: space-between;margin: 20px 0;">
             <div style="display: flex;">
-                <el-input style="margin: 0 10px 0 0;" v-model="searchForm.componentsname" placeholder="组件名搜索"></el-input>
+                <el-input style="margin: 0 10px 0 0;" v-model="searchForm.componentsname"
+                    placeholder="组件名搜索"></el-input>
                 <el-input style="margin: 0 10px 0 0;" v-model="searchForm.manufacturer" placeholder="厂商搜索"></el-input>
             </div>
             <div>
                 <el-button size="medium" type="success" icon="el-icon-plus" @click="add">新增组件</el-button>
                 <el-button size="medium" type="primary" icon="el-icon-search" @click="search">搜索</el-button>
+                <el-button size="medium" type="primary" icon="el-icon-search" @click="print">打印当前列表</el-button>
             </div>
         </div>
-        <el-table :data="tabledata" border height="500" max-heiht="800">
+        <el-table :data="tabledata" border id="print">
             <el-table-column label="组件名" prop="componentsname"></el-table-column>
             <el-table-column label="厂商" prop="manufacturer"></el-table-column>
             <el-table-column label="单价" prop="price"></el-table-column>
@@ -30,94 +46,114 @@
             <el-table-column label="仓库中位置" prop="position"></el-table-column>
             <el-table-column label="操作" prop="componentname">
                 <template slot-scope="scope">
-                    <el-button size="small" type="success" icon="el-icon-plus" @click="go">入库</el-button>
+                    <el-button size="small" type="success" icon="el-icon-plus" @click="go(scope.row)">入库</el-button>
                     <el-button size="small" type="danger" icon="el-icon-minus" @click="out">出库</el-button>
                 </template>
             </el-table-column>
         </el-table>
-        <el-pagination
-            layout="prev, pager, next"
-            @current-change="pageChange"
-            :total="totalPage">
+        <el-pagination layout="prev, pager, next" @current-change="pageChange" :total="totalPage">
         </el-pagination>
     </div>
 </body>
 <script>
     new Vue({
-        el:"#main_con",
-        data:{
-            tabledata:[
+        el: "#main_con",
+        data: {
+            tabledata: [
                 {
-                    componentname:"大锤",
+                    componentname: "大锤",
 
                 },
             ],
-            searchForm:{
-                componentname:"",
-                manufacturer:"",
+            searchForm: {
+                componentname: "",
+                manufacturer: "",
             },
-            totalPage:0,
+            totalPage: 0,
         },
-        methods:{
-            pageChange(){
-
+        methods: {
+            pageChange(page) {
+                this.searchForm.page = page;
+                this.getList();
             },
-            search(){
-
+            search() {
+                this.getList();
             },
-            add(){
+            add() {
                 window.location.href = "./addComponent.html"
             },
-            go(){
-                this.$prompt('输入入库数量','提示',{
-                    confirmButtonText:"确定",
-                    cancelButtonText:"取消",
-                    closeOnClickModal:false,
-                    inputValidator:this.goFuncValidator,
-                }).then(({value})=>{
+            go(row) {
+                this.$prompt('输入入库数量', '提示', {
+                    confirmButtonText: "确定",
+                    cancelButtonText: "取消",
+                    closeOnClickModal: false,
+                    inputValidator: this.goFuncValidator,
+                }).then(({ value }) => {
                     this.$message({
                         type: 'success',
-                        message: '真牛逼，一下子成功新加了'+value+'个库存!'
-                    });  
-                    return   
+                        message: '真牛逼，一下子成功新加了' + value + '个库存!'
+                    });
                     $.ajax({
-                        url:"",
-                        type:"post",
-                        data:{
-
+                        url: "/tomato/changeComponentNum",
+                        type: "post",
+                        data: {
+                            id:row.id,
+                            isAdd:true,
+                            num:value
                         },
-                        success:(data)=>{
-                            
+                        success: (data) => {
+
                         }
                     })
                 })
             },
-            goFuncValidator(val){
+            goFuncValidator(val) {
                 var reg = new RegExp("^-?[0-9]*.?[0-9]*$");
-                if(!reg.test(val)){
+                if (!reg.test(val)) {
                     return "你是傻逼吗？只能输入数字！"
                 }
                 return true
             },
-            out(){
+            out() {
 
+            },
+            print() {
+
+                printJS({
+                    printable: this.tabledata,
+                    header: '<h3 class="custom-h3">配件表</h3>',
+                    style: '.custom-h3 { color: red; }',
+                    gridHeaderStyle: 'color: red;  border: 2px solid #3971A5;',
+                    gridStyle: 'border: 2px solid #3971A5;',
+                    properties: [
+                        { field: 'componentsname', displayName: '配件名' },
+                        { field: 'manufacturer', displayName: '厂商' },
+                        { field: 'price', displayName: '单价' },
+                        { field: 'cost', displayName: '成本' },
+                        { field: 'num', displayName: '库存' },
+                        { field: 'position', displayName: '仓库中位置' },
+                    ],
+                    type: 'json'
+                })
+            },
+            getList() {
+                $.ajax({
+                    url: "/tomato/getComponentList",
+                    type: "get",
+                    data: this.searchForm,
+                    success: (data) => {
+                        if (data.code == 'v') {
+                            this.totalPage = data.data.total;
+                            this.tabledata = data.data.records;
+                        }
+                    }
+                })
             }
         },
-        mounted(){
-            $.ajax({
-                url:"/tomato/getComponentList",
-                type:"get",
-                data:{
-
-                },
-                success:(data)=>{
-                    if(data.code == 'v'){
-                        this.totalPage = data.data.total;
-                        this.tabledata = data.data.list;
-                    }
-                }
-            })
+        mounted() {
+            this.getList();
         }
     })
 </script>
+
 </html>
