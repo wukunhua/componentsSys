@@ -78,7 +78,7 @@
                 this.$refs.form.validate((validate)=>{
                     if(validate){
                         $.ajax({
-                            url:"/tomato/saveComponent",
+                            url:"/tomato/component/save",
                             type:"post",
                             data:this.form,
                             success:(data)=>{

@@ -47,7 +47,7 @@
             <el-table-column label="操作" prop="componentname">
                 <template slot-scope="scope">
                     <el-button size="small" type="success" icon="el-icon-plus" @click="go(scope.row)">入库</el-button>
-                    <el-button size="small" type="danger" icon="el-icon-minus" @click="out">出库</el-button>
+                    <el-button size="small" type="danger" icon="el-icon-minus" @click="out" v-if="scope.row.num > 1">出库</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -94,7 +94,7 @@
                         message: '真牛逼，一下子成功新加了' + value + '个库存!'
                     });
                     $.ajax({
-                        url: "/tomato/changeComponentNum",
+                        url: "/tomato/component/changeNum",
                         type: "post",
                         data: {
                             id:row.id,
@@ -138,7 +138,7 @@
             },
             getList() {
                 $.ajax({
-                    url: "/tomato/getComponentList",
+                    url: "/tomato/component/getList",
                     type: "get",
                     data: this.searchForm,
                     success: (data) => {
