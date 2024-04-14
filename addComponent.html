@@ -45,12 +45,12 @@
         el: "#main_con",
         data: {
             form: {
-                componentsname:"",
-                manufacturer:"",
-                cost:"",
-                num:"",
-                price:"",
-                position:"",
+                componentsname: "",
+                manufacturer: "",
+                cost: "",
+                num: "",
+                price: "",
+                position: "",
             },
             rules: {
                 componentsname: [
@@ -60,13 +60,13 @@
                     { required: true, message: '请输入厂商', trigger: 'change' }
                 ],
                 num: [
-                    {  required: true, message: '请输入配件数量', trigger: 'change' }
+                    { required: true, message: '请输入配件数量', trigger: 'change' }
                 ],
                 price: [
-                    {  required: true, message: '请输入配件价格', trigger: 'change' }
+                    { required: true, message: '请输入配件价格', trigger: 'change' }
                 ],
                 cost: [
-                    {  required: true, message: '请输入配件成本', trigger: 'change' }
+                    { required: true, message: '请输入配件成本', trigger: 'change' }
                 ],
                 position: [
                     { required: true, message: '请输入配件位置', trigger: 'blur' }
@@ -74,15 +74,18 @@
             }
         },
         methods: {
-            submitForm(){
-                this.$refs.form.validate((validate)=>{
-                    if(validate){
+            submitForm() {
+                this.$refs.form.validate((validate) => {
+                    if (validate) {
                         $.ajax({
-                            url:"/tomato/saveComponent",
-                            type:"post",
-                            data:this.form,
-                            success:(data)=>{
-                                if(data.code == 'v'){
+                            url: "/tomato/component/save",
+                            type: "post",
+                            headers: {
+                                token: sessionStorage.getItem("token")
+                            },
+                            data: this.form,
+                            success: (data) => {
+                                if (data.code == '200') {
                                     this.$message({
                                         message: '添加成功！',
                                         type: 'success'

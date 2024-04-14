@@ -12,6 +12,7 @@
     <script src="/js/element/index.js"></script>
     <script src="./js/html2canvas.js"></script>
     <script src="./js/printjs/print.min.js"></script>
+    <script src="./js/request.js"></script>
     <style>
         .el-pagination {
             text-align: right;
@@ -47,7 +48,7 @@
             <el-table-column label="操作" prop="componentname">
                 <template slot-scope="scope">
                     <el-button size="small" type="success" icon="el-icon-plus" @click="go(scope.row)">入库</el-button>
-                    <el-button size="small" type="danger" icon="el-icon-minus" @click="out">出库</el-button>
+                    <el-button size="small" type="danger" icon="el-icon-minus" @click="out(scope.row)">出库</el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -89,20 +90,23 @@
                     closeOnClickModal: false,
                     inputValidator: this.goFuncValidator,
                 }).then(({ value }) => {
-                    this.$message({
-                        type: 'success',
-                        message: '真牛逼，一下子成功新加了' + value + '个库存!'
-                    });
-                    $.ajax({
-                        url: "/tomato/changeComponentNum",
+
+                    $ajax({
+                        url: "/tomato/component/changeNum",
                         type: "post",
                         data: {
-                            id:row.id,
-                            isAdd:true,
-                            num:value
+                            id: row.id,
+                            isAdd: true,
+                            num: value
                         },
                         success: (data) => {
-
+                            if (data.code == '200') {
+                                this.$message({
+                                    type: 'success',
+                                    message: '操作成功!'
+                                });
+                                this.getList();
+                            }
                         }
                     })
                 })
@@ -114,8 +118,33 @@
                 }
                 return true
             },
-            out() {
+            out(row) {
+                this.$prompt('输入入库数量', '提示', {
+                    confirmButtonText: "确定",
+                    cancelButtonText: "取消",
+                    closeOnClickModal: false,
+                    inputValidator: this.goFuncValidator,
+                }).then(({ value }) => {
 
+                    $ajax({
+                        url: "/tomato/component/changeNum",
+                        type: "post",
+                        data: {
+                            id: row.id,
+                            isAdd: false,
+                            num: value
+                        },
+                        success: (data) => {
+                            if (data.code == '200') {
+                                this.$message({
+                                    type: 'success',
+                                    message: '操作成功!'
+                                });
+                                this.getList();
+                            }
+                        }
+                    })
+                })
             },
             print() {
 
@@ -137,12 +166,12 @@
                 })
             },
             getList() {
-                $.ajax({
-                    url: "/tomato/getComponentList",
+                $ajax({
+                    url: "/tomato/component/getList",
                     type: "get",
                     data: this.searchForm,
                     success: (data) => {
-                        if (data.code == 'v') {
+                        if (data.code == '200') {
                             this.totalPage = data.data.total;
                             this.tabledata = data.data.records;
                         }
@@ -151,6 +180,7 @@
             }
         },
         mounted() {
+            window.$vue = this;
             this.getList();
         }
     })
