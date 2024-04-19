@@ -63,7 +63,7 @@
                     success: (data) => {
                         if (data.code == '200') {
                             sessionStorage.setItem("token", data.data.token);
-                            window.location.href = "./index.html";
+                            window.location.href = "/component/index.html";
                         } else {
                             this.$message({
                                 message: '登录成功',

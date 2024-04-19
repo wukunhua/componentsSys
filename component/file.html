@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="/js/element/theme-default/index.css">
+    <script src="/js/jquery-1.7.2.min.js"></script>
+    <script src="/js/vue.min.js"></script>
+    <script src="/js/element/index.js"></script>
+    <script src="/js/tomatoTools.js"></script>
+</head>
+
+<body>
+    <div id="main_con">
+        <el-upload class="upload-demo" ref="upload" action="/tomato/file/sumPrice"
+            :headers="headers"
+            :on-success="success"
+            :on-preview="handlePreview" :on-remove="handleRemove" :file-list="fileList" :auto-upload="false">
+            <el-button slot="trigger" size="small" type="primary">选取文件</el-button>
+            <el-button style="margin-left: 10px;" size="small" type="success" @click="submitUpload">计算总和</el-button>
+        </el-upload>
+        <div>
+            <div v-for="item in sumRes.files">
+                <span style="font-weight: bold;">文件名：</span>
+                <span style="margin-right: 20px;">{{item.name}}</span>
+                <span style="font-weight: bold;">值：</span>
+                <span>{{item.value}}</span>
+            </div>
+            <div>
+                <span style="font-weight: bold;">总和：</span>
+                <span style="margin-right: 20px;">{{sumRes.totalPrice}}</span>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    new Vue({
+        el: "#main_con",
+        data: {
+            fileList: [],
+            headers:{
+                token: sessionStorage.getItem("token")
+            },
+            sumRes:{},
+        },
+        methods: {
+            submitUpload() {
+                this.$refs.upload.submit();
+            },
+            handleRemove(file, fileList) {
+                console.log(file, fileList);
+            },
+            handlePreview(file) {
+                console.log(file);
+            },
+            success(res){
+                if(res.code != '200'){
+                    msgBox("error",data.msg)
+                }
+                if(res.code == '200'){
+                    msgBox("success","计算成功")
+                    this.sumRes = res.data;
+                }
+            }
+        },
+        mounted() {
+            window.$vue = this;
+        }
+    })
+</script>
+
+</html>

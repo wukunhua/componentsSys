@@ -16,13 +16,16 @@
                         msgBox("error",data.msg)
                         if(data.data == 'needLogin'){
                             setTimeout(()=>{
-                                window.top.location.href = "./login.html"
+                                window.top.location.href = "/login.html"
                             },1000)
                         }
                     }
                 },
                 complete:()=>{
                     !!obj.complete && obj.complete();
+                },
+                error:(data)=>{
+                    msgBox("error",data.msg)
                 }
             })
         }
